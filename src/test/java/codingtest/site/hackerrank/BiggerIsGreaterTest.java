@@ -17,7 +17,12 @@ public class BiggerIsGreaterTest {
         Assert.assertThat(BiggerIsGreater.solve("abedc"), is("acbde"));
 
         Assert.assertThat(BiggerIsGreater.solve("aaa"), is("no answer"));
-
         Assert.assertThat(BiggerIsGreater.solve("fvincndjrurfh"), is("fvincndjrurhf"));
+
+        Assert.assertThat(BiggerIsGreater.solve("ab"), is("ba"));
+        Assert.assertThat(BiggerIsGreater.solve("bb"), is("no answer"));
+        Assert.assertThat(BiggerIsGreater.solve("hefg"), is("hegf"));
+        Assert.assertThat(BiggerIsGreater.solve("dhck"), is("dhkc"));
+        Assert.assertThat(BiggerIsGreater.solve("dkhc"), is("hcdk"));
     }
 }

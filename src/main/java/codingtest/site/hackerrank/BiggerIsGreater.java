@@ -20,8 +20,15 @@ import java.util.Scanner;
 public class BiggerIsGreater {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        String s = scan.next();
-        System.out.println(solve(s));
+        int count = scan.nextInt();
+        String[] str = new String[count];
+        for (int i = 0 ; i < count ; i++) {
+            str[i] = scan.next();
+        }
+
+        for (int i = 0 ; i < count ; i++) {
+            System.out.println(solve(str[i]));
+        }
     }
 
     /**
