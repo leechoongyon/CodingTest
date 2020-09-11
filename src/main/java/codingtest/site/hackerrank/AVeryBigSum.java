@@ -15,11 +15,11 @@ public class AVeryBigSum {
             bigIntegers[i] = new BigInteger(str[i]);
         }
 
-        BigInteger result = aVeryBigSum(bigIntegers);
+        BigInteger result = solve(bigIntegers);
         System.out.println(result);
     }
 
-    public static BigInteger aVeryBigSum(BigInteger[] bigIntegers) {
+    public static BigInteger solve(BigInteger[] bigIntegers) {
         BigInteger sum = BigInteger.ZERO;
         for (BigInteger bigInteger : bigIntegers) {
             sum = sum.add(bigInteger);
