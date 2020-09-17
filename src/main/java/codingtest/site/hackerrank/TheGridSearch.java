@@ -29,24 +29,26 @@ public class TheGridSearch {
         Scanner in = new Scanner(System.in);
         int t = in.nextInt();
         for (int i = 0 ; i < t ; i++) {
-            /** row */
+            /** grid row */
             int R = in.nextInt();
-            /** column */
+            /** grid column */
             int C = in.nextInt();
 
-            String[] grid = new String[R];
+            StringBuilder grid = new StringBuilder();
             for (int k = 0 ; k < R ; k++) {
-                grid[k] = in.next();
+                grid.append(in.next());
             }
 
+            /** pattern row */
             int r = in.nextInt();
+            /** pattern column */
             int c = in.nextInt();
 
             String[] pattern = new String[r];
             for (int k = 0 ; k < r ; k++) {
                 pattern[k] = in.next();
             }
-            System.out.println(solve(grid, pattern, r, c));
+            System.out.println(solve(grid.toString(), pattern, R, C, r, c));
         }
     }
 
@@ -107,24 +109,47 @@ public class TheGridSearch {
      *
      *      - 123456098765111111 이게 한줄인데 이걸 만드는 로직을 고민.
      *      - BigOperationTest
+     *      - 아래 처럼 for 문 2번 돌리니 O(n 제곱)
+     *
+     *  4. 3번의 아이디어에서 만들기 전에 비교.
+     *      - 그럼 다 만듪필요 없음.
+     *      - timeout 2개 걸림.
+     *      - 시간복잡도가 O(n제곱) 인데 왜 timeout 이 나는거지.
      *
      * @return
      */
-    private static String solve(String[] grid, String[] pattern, int r, int c) {
-        int gridColLength = grid[0].length();
-        int gridRowLength = grid.length;
+    private static String solve(String grid, String[] pattern,
+                                int gridRow, int gridCol,
+                                int patternRow, int patternCol) {
 
-        for (int row = 0 ; row < gridRowLength - r ; row++) {
-            for (int col = 0 ; col < gridColLength - c ; col++) {
-                System.out.println();
+        for (int i = 0 ; i <= (gridRow - patternRow) * gridCol + (gridCol - patternCol)  ; i++) {
+            int idx = i;
+            StringBuilder subGrid = new StringBuilder();
+            for (int k = 0 ; k < patternRow ; k++) {
+                String tmp = grid.substring(idx, idx + patternCol);
+
+//                System.out.println("start : " + idx + "   end : " + (idx + patternCol) );
+
+                if ( !pattern[k].equals(tmp)) {
+                    break;
+                }
+                subGrid.append(tmp);
+                idx += patternCol;
+                idx += gridCol - patternCol;
+            }
+
+            if (subGrid.toString().equals(toString(pattern))) {
+                return "YES";
             }
         }
+        return "NO";
+    }
 
-//        for (int i = 0 ; i < gridColLength - c ; i++) {
-//            for (int k = 0 ; k < gridRowLength - r ; k++) {
-//                System.out.println(grid[k].substring(i, c));
-//            }
-//        }
-        return "";
+    private static String toString(String[] pattern) {
+        StringBuilder sb = new StringBuilder();
+        for (String s : pattern) {
+            sb.append(s);
+        }
+        return sb.toString();
     }
 }
