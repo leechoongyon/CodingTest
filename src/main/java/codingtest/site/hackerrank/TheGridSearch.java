@@ -1,10 +1,8 @@
 package codingtest.site.hackerrank;
 
-import java.math.BigInteger;
 import java.util.Scanner;
 
 /**
-
 1
 10 10
 7283455864
@@ -21,10 +19,12 @@ import java.util.Scanner;
 9505
 3845
 3530
-
  */
 
 public class TheGridSearch {
+
+    private static final Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         int t = in.nextInt();
@@ -34,9 +34,10 @@ public class TheGridSearch {
             /** grid column */
             int C = in.nextInt();
 
-            StringBuilder grid = new StringBuilder();
+            /** 입력배열 */
+            String[] grid = new String[C];
             for (int k = 0 ; k < R ; k++) {
-                grid.append(in.next());
+                grid[k] =in.next();
             }
 
             /** pattern row */
@@ -48,108 +49,94 @@ public class TheGridSearch {
             for (int k = 0 ; k < r ; k++) {
                 pattern[k] = in.next();
             }
-            System.out.println(solve(grid.toString(), pattern, R, C, r, c));
+            System.out.println(solve(grid, pattern));
         }
     }
 
+
+
     /**
-     * https://www.hackerrank.com/challenges/the-grid-search/problem
-     *
-     * 문제 : Grid 와 pattern 이 주어졌을 때, Grid 안에 Pattern 이 존재하는지 확인.
-     *       존재하면 'YES', 없으면 'NO' 리
-     *
-     * 제약사항 : row, column 은 1000 이 한계임.
-     *
-     * 풀이 :
      *
      * 1. brute-force
-     *    - 맨 위에서부터 for 문 돌리면서 pattern 이 첫 줄이 존재하는지 확인.
-     *    - pattern 의 첫줄과 일치하면 나머지도 각각 비교.
-     *    - 이 때, 일치하는 것을 찾았을 때 index 를 저장해놔야겠지.
      *
-     *    - grid 를 for 문 돌리면서 pattern 의 첫번째 index 와 일치하는게 있는지 확인 (startWith 사용)
-     *    - 일치하는게 있다면 계속해서 pattern 과 grid 를 증가시키면서 확인.
+     *  - 입력 배열에서 일치하는 배열을 찾음.
+     *  - 목표 배열의 크기 만큼 입력 배열에 존재하는지 찾기.
      *
-     *    - 시간복잡도 O(n 세제곱)
+     *  - 주의사항 :
+     *      입력 배열에서 동일한 입력 배열이 있을 수 있음.
+     *      그렇기에 입력배열의 1행에서 동일한 값이 몇 번 나오는지 확인이 필요.
+     *      이렇게 안한다면 입력배열을 계속 확인해야하므로.
+     *      예를 들면, 입력 배열의 첫행이 12345345 이고, 목표배열[0] 이 34 라면. 입력배열[0] 에는 34가 2번있는거임.
      *
-     * 2. 데이터를 가공해서 처리.
+     *  - 최악의 경우 시간복잡도 : O(gridHeightLen * gridWidthLen * patternHeightLen * gridWidthLen * patternWidthLen)
+     *      - 최악의 경우 gridHeightLen 만큼 for 문 돌림.
+     *      - 최악의 경우 gridWidthLen 만큼 countContainsPattern 가 발생.
+     *      - 최악의 경우 patternHeightLen 만큼 for 문 돌림.
+     *      - 최악의 경우 contains 에서 gridWidthLen * patternWidthLen 이 발생.
      *
-     *    - 아래와 같은 예제가 있다고 가정.
-     *    - 아래 input 을 일렬로 쭉 세운다. pattern 도 마찬가지로 일렬로 쭉 세운다.
-     *    - BigInteger 로 and 연산해서 같은 값이 나오면 input 에 pattern 이 존재하는 것이다.
-     *    - 데이터 가공하는데 O(n세제곱)
-     *    - and 연산하는데 O(n) 이니 최종 시간복잡도는 O(n세제곱)
-     *
-     *      input
-     *      1234567890
-     *      0987654321
-     *      1111111111
-     *      1111111111
-     *      2222222222
-     *
-     *      가공 input
-     *      123456098765111111
-     *      234567987654111111
-     *      ...
-     *      ...
-     *      ...
-     *
-     *      pattern
-     *      876543
-     *      111111
-     *      111111
-     *
-     *      pattern 가공
-     *      876543111111111111
-     *
-     *
-     *  3. 일랼로 쭉 세운 뒤, and 연산
-     *      - 일렬로 쭉 세우는게 3n
-     *      - 12345678900987654321111111111111111111112222222222
-     *
-     *      - 123456098765111111 이게 한줄인데 이걸 만드는 로직을 고민.
-     *      - BigOperationTest
-     *      - 아래 처럼 for 문 2번 돌리니 O(n 제곱)
-     *
-     *  4. 3번의 아이디어에서 만들기 전에 비교.
-     *      - 그럼 다 만듪필요 없음.
-     *      - timeout 2개 걸림.
-     *      - 시간복잡도가 O(n제곱) 인데 왜 timeout 이 나는거지.
-     *
+     * @param grid
+     * @param pattern
      * @return
      */
-    private static String solve(String grid, String[] pattern,
-                                int gridRow, int gridCol,
-                                int patternRow, int patternCol) {
+    public static String solve(String[] grid, String[] pattern) {
 
-        for (int i = 0 ; i <= (gridRow - patternRow) * gridCol + (gridCol - patternCol)  ; i++) {
-            int idx = i;
-            StringBuilder subGrid = new StringBuilder();
-            for (int k = 0 ; k < patternRow ; k++) {
-                String tmp = grid.substring(idx, idx + patternCol);
+        /** 입력 배열의 가로 길이 */
+        int gWidthLen = grid[0].length();
 
-//                System.out.println("start : " + idx + "   end : " + (idx + patternCol) );
+        /** 입력 배열의 세로 길이 */
+        int gHeightLen = grid.length;
 
-                if ( !pattern[k].equals(tmp)) {
+        /** 패턴의 세로 길이 */
+        int pHeightLen = pattern.length;
+
+        /** 입력배열을 한행씩 조회해서 목표배열[0] 이 있는지 확인 */
+        for (int i = 0 ; i < gHeightLen ; i++) {
+            /** 한 행에서 Pattern 을 몇 개 가지고 있는지 표현 */
+            int countContainsPattern = 0;
+            /**
+             *  입력 배열에서 패턴을 찾는 것이다. 근데 한 번만 찾는게 아니라 계속해서 찾는 것.
+             *  만약, 입력 배열 G[0] 에서 Pattern[0] 이 3개 라면, countContainsPatternForLine = 3 이다.
+             **/
+            int fromIdx = -1;
+            while ( true ) {
+                fromIdx = grid[i].indexOf(pattern[0], fromIdx + 1);
+                if (fromIdx >= 0) {
+                    countContainsPattern++;
+                } else {
                     break;
                 }
-                subGrid.append(tmp);
-                idx += patternCol;
-                idx += gridCol - patternCol;
             }
 
-            if (subGrid.toString().equals(toString(pattern))) {
-                return "YES";
+            int startIdx = -1;
+            /** 입력배열[i] 에서 패턴이 존재할 때, for 문을 돌린다. */
+            for (int k = 0 ; k < countContainsPattern ; k++) {
+
+                /** startIdx 가 하는 역할은 입력배열[i] 행에 pattern 이 시작하는 인덱스가 몇 번인지 파악. */
+                startIdx = grid[i].indexOf(pattern[0], startIdx + 1);
+
+                /** 패턴이 일치할 때까지 찾기. */
+                for (int p = 0 ; p < pHeightLen ; p++) {
+                    /**
+                     *  grid 의 다음행이 pattern 의 다음행과 일치하는지 확인.
+                     *  만약 위 조건이 맞다면, 위에서 구한 startIdx 와 grid 에서 찾은 pattern 의 인덱스가 같은지 비교.
+                     *  같은 행에 패턴이 여러개 있을 수 있으니.
+                     **/
+                    if ( (grid[i + p].contains(pattern[p])) && (startIdx == grid[i + p].indexOf(pattern[p], startIdx)) ) {
+
+                        /** 패턴의 모든 높이를 탐색했으니 YES */
+                        if (p + 1 == pHeightLen) {
+                            return "YES";
+                        }
+                        /** 패턴을 모두 탐색하기 전에 입력배열의 높이를 모두 탐색했으면 답이 없는거임. */
+                        else if (i + p + 1 == gHeightLen) {
+                            return "NO";
+                        }
+                    } else {
+                        break;
+                    }
+                }
             }
         }
         return "NO";
-    }
-
-    private static String toString(String[] pattern) {
-        StringBuilder sb = new StringBuilder();
-        for (String s : pattern) {
-            sb.append(s);
-        }
-        return sb.toString();
     }
 }
