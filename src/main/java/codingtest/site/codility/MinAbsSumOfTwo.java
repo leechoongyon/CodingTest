@@ -4,11 +4,12 @@ import java.util.Arrays;
 
 public class MinAbsSumOfTwo {
     public static void main(String[] args) {
-        int[] A = new int[]{-8,4,5,-10,3};
-        // -10, -8, 3,4,5
-        // -9, -7, -5, 0, 2, 4, 7
-        System.out.println(new MinAbsSumOfTwo().solution(A) == 3);
+//        int[] A = new int[]{-8,-7,-3,-1};
+//        System.out.println(new MinAbsSumOfTwo().solution(A) == 2);
 
+        int[] A = new int[]{-8,4,5,-10,3};
+        System.out.println(new MinAbsSumOfTwo().solution(A) == 3);
+//
 //        A = new int[]{1,4,-3};
 //        System.out.println(new MinAbsSumOfTwo().solution(A) == 1);
 //
@@ -26,6 +27,42 @@ public class MinAbsSumOfTwo {
 //        System.out.println(new MinAbsSumOfTwo().solution(A) == 4);
     }
 
+
+    public int solution(int[] A) {
+        int N = A.length;
+        Arrays.sort(A);
+        int head = 0;
+        int tail = N - 1;
+
+        // 양끝에서부터 시작
+        int min = Math.abs(A[head] + A[tail]);
+        while (head <= tail) {
+            int currentSum = A[head] + A[tail];
+            min = Math.min(min, Math.abs(currentSum));
+            // 음수라는건 head 쪽에 음수가 있다는 것. 그러므로 음수 쪽을 오른쪽으로 이동시켜주면 더 작아지겠지.
+            if (currentSum <= 0) {
+                head++;
+            }
+            // 0이상이라는건 tail 쪽 양수가 크다는 것. 그러면 tail 쪽을 왼쪽으로 옮겨주면 작아지겠지.
+            else {
+                tail--;
+            }
+        }
+        return min;
+    }
+
+    public int solution3(int[] A) {
+        Integer[] tmp = Arrays.stream(A).boxed().toArray(Integer[]::new);
+
+        Arrays.sort(tmp, (a,b) -> (Integer.compare( Math.abs(a),  Math.abs(b))));
+
+        int min = Math.abs(tmp[0] + tmp[0]);
+
+        for (int i = 0 ; i < tmp.length - 1 ; i++) {
+            min = Math.min(min, Math.abs(tmp[i] + tmp[i+1]));
+        }
+        return min;
+    }
 
     /**
      * 문제 : A 에서 2개를 선택해 더한 후, Absolute 수식을 적용한 것 중 제일 작은 값을 구하라.
@@ -55,10 +92,21 @@ public class MinAbsSumOfTwo {
      *  solution 3
      *  절대 값으로 정렬 후, 인접한 것끼리 비교하면 됨. 왜냐하면 그럴 때 diff 가 제일 작은 값이기에
      *
+     *
+     *  solution 4
+     *  sort 한 후, 양 끝에서부터 diff 를 비교해 나간다.
+     *  diff 가 음수라면 왼쪽에 있는 값(음수) 가 작다는 것이다. 오른쪽으로 이동시켜준다.
+     *  음수에서 오른쪽으로 이동할수록 절대 값은 작아질테니.
+     *  diff 가 양수라면 오른쪽에 있는 값(양수) 가 크다는 것이다. 왼쪽으로 이동시켜준다.
+     *  양수에서 왼쪽으로 이동할수록 절대 값은 작아질테니.
+     *
+     *  즉, head, tail index point 를 둬서 절대 값이 작아지는 방향으로 계속 계산해나가느 방식이다.
+     *  시간복잡도 O(n log n)
+     * 
      * @param A
      * @return
      */
-    public int solution(int[] A) {
+    public int solution2(int[] A) {
         if (A.length == 1) {
             return Math.abs(A[0] * 2);
         }
