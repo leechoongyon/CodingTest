@@ -43,9 +43,45 @@ public class Peaks {
      * @param A
      * @return
      */
-
     public int solution(int[] A) {
+        List<Integer> peaks = getPeaks(A);
+        int len = A.length;
+
+        // A 에서 divide 가 최대로 나올 수 있는 수는 peaks 개수만큼이니 peaks 부터 구해줌.
+        for (int divideCount = peaks.size() ; divideCount >= 1 ; divideCount--) {
+            // Array 가 divideCount 로 나눈 나머지가 0이여야 divide 가 같은 element 가 됨.
+            if (len % divideCount == 0) {
+                // 한 block 에 들어가는 size
+                int blockSize = A.length / divideCount;
+                // block 에 들어간 peaks count
+                int peaksCountContainBlock = 0;
+                for (int peakIdx : peaks) {
+                    /**
+                     * 앞에서부터 count 를 할텐데. peakIdx 가 blockSize 에 나눠져서 peaksCountContainBlock 이랑 같다는건 해당 block 에 peaks 가 있다는 것.
+                     * 이게 핵심임. peakIdx 는 앞에서부터 시작되고, 앞 block 부터 peaks 가 안채워지면 뒤에 가서 만족을 못함.
+                     * 같은 block 내에 peaks 가 2개 이상이여도 아래 로직대로라면 문제 없음. 이미 블록에서 peaks 가 존재한다는 것을 체크했으면 다음으로 넘어갔을테니.
+                     * 아래 로직이 best 이고, 0 <= peakIdx > block Idx 이런식으로 if 문을 조회해서 찾아도 됨.
+                     * 0 <= peakIdx > blockIdx 를 만족하면 다음 블록 idx 로 넘어가는거지.
+                     */
+                    if (peakIdx / blockSize == peaksCountContainBlock) {
+                        peaksCountContainBlock++;
+                    }
+                }
+                if (peaksCountContainBlock == divideCount) {
+                    return peaksCountContainBlock;
+                }
+            }
+        }
         return 0;
     }
 
+    private List<Integer> getPeaks(int[] A) {
+        List<Integer> peaks = new ArrayList<>();
+        for (int idx = 1; idx < A.length - 1; idx++) {
+            if (A[idx - 1] < A[idx] && A[idx] > A[idx + 1]) {
+                peaks.add(idx);
+            }
+        }
+        return peaks;
+    }
 }
